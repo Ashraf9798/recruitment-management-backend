@@ -13,17 +13,26 @@ const app = express();
 
 config(); // ✅ FIXED
 
+// app.use(
+//   cors({
+//     origin: [
+//       process.env.FRONTEND_URL,
+//       "http://localhost:5173",
+//       "http://localhost:3000",
+//     ],
+//     methods: ["GET", "POST", "DELETE", "PUT"], // ✅ FIXED
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: [
-      process.env.FRONTEND_URL,
-      "http://localhost:5173",
-      "http://localhost:3000",
-    ],
-    methods: ["GET", "POST", "DELETE", "PUT"], // ✅ FIXED
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
+
 
 app.use(cookieParser());
 app.use(express.json());
