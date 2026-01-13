@@ -1,5 +1,5 @@
 import express from "express";
-import dbConnection  from "./database/dbConnection.js";
+import dbConnection from "./database/dbConnection.js";
 import jobRouter from "./routes/jobRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import applicationRouter from "./routes/applicationRoutes.js";
@@ -10,12 +10,17 @@ import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 
 const app = express();
-config({ path: "./config/config.env" });
+
+config(); // ✅ FIXED
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL],
-    method: ["GET", "POST", "DELETE", "PUT"],
+    origin: [
+      process.env.FRONTEND_URL,
+      "http://localhost:5173",
+      "http://localhost:3000",
+    ],
+    methods: ["GET", "POST", "DELETE", "PUT"], // ✅ FIXED
     credentials: true,
   })
 );
@@ -30,10 +35,11 @@ app.use(
     tempFileDir: "/tmp/",
   })
 );
+
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/job", jobRouter);
 app.use("/api/v1/application", applicationRouter);
-dbConnection();
 
 app.use(errorMiddleware);
+
 export default app;
