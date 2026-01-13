@@ -1,17 +1,20 @@
-import mongoose from "mongoose"; //just mongoose import!
-import dotenv from "dotenv"
-dotenv.config()
+import mongoose from "mongoose";
 
-//Database connection here!
- const dbConnection  = ()=>{
-    mongoose.connect(process.env.DB_URL,{
-       dbName: "Job_Portal"
+const dbConnection = async () => {
+  try {
+    if (!process.env.MONGO_URI) {
+      throw new Error("MONGO_URI is not defined");
+    }
 
-    }).then(()=>{ //agar connect ho jaye toh!
-       console.log("MongoDB Connected Sucessfully !")
-    }).catch((error)=>{
-        console.log(`Failed to connect ${error}`) //warna error de do console me!
-    })
-    
-}
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "recruitment_management",
+    });
+
+    console.log("MongoDB Connected Successfully!");
+  } catch (error) {
+    console.error("Failed to connect MongoDB:", error.message);
+    process.exit(1); // ❗ stop server if DB fails
+  }
+};
+
 export default dbConnection;
