@@ -43,18 +43,33 @@ export const login = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 201, res, "User Logged In Sucessfully !");
 });
 
+// export const logout = catchAsyncErrors(async (req, res, next) => {
+//   res
+//     .status(201)
+//     .cookie("token", "", {
+//       httpOnly: true,
+//       expires: new Date(Date.now()),
+//     })
+//     .json({
+//       success: true,
+//       message: "Logged Out Successfully !",
+//     });
+// });
+
 export const logout = catchAsyncErrors(async (req, res, next) => {
-  res
-    .status(201)
-    .cookie("token", "", {
-      httpOnly: true,
-      expires: new Date(Date.now()),
-    })
-    .json({
-      success: true,
-      message: "Logged Out Successfully !",
-    });
+  res.cookie("token", "", {
+    httpOnly: true,
+    secure: true,        // REQUIRED (Render + Vercel)
+    sameSite: "none",    // REQUIRED (cross-site)
+    expires: new Date(0),
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged Out Successfully!",
+  });
 });
+
 
 
 export const getUser = catchAsyncErrors((req, res, next) => {
