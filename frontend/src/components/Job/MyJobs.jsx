@@ -1,10 +1,10 @@
-import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaCheck } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { Context } from "../../main";
 import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 const MyJobs = () => {
   const [myJobs, setMyJobs] = useState([]);
@@ -14,23 +14,27 @@ const MyJobs = () => {
   const navigateTo = useNavigate();
   //Fetching all jobs
   useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const { data } = await axios.get(
-          "http://localhost:4000/api/v1/job/getmyjobs",
-          { withCredentials: true }
-        );
-        setMyJobs(data.myJobs);
-      } catch (error) {
-        toast.error(error.response.data.message);
-        setMyJobs([]);
-      }
-    };
+  const fetchJobs = async () => {
+    try {
+      const { data } = await api.get("/api/v1/job/getmyjobs");
+      setMyJobs(data.myJobs);
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Failed to fetch jobs"
+      );
+      setMyJobs([]);
+    }
+  };
+
+  if (isAuthorized && user?.role === "Employer") {
     fetchJobs();
-  }, []);
-  if (!isAuthorized || (user && user.role !== "Employer")) {
-    navigateTo("/");
   }
+}, [isAuthorized, user]);
+
+  if (!isAuthorized || (user && user.role !== "Employer")) {
+  return null;
+}
+
 
   //Function For Enabling Editing Mode
   const handleEnableEdit = (jobId) => {
@@ -45,34 +49,37 @@ const MyJobs = () => {
 
   //Function For Updating The Job
   const handleUpdateJob = async (jobId) => {
+  try {
     const updatedJob = myJobs.find((job) => job._id === jobId);
-    await axios
-      .put(`http://localhost:4000/api/v1/job/update/${jobId}`, updatedJob, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        toast.success(res.data.message);
-        setEditingMode(null);
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
-      });
-  };
+    const { data } = await api.put(
+      `/api/v1/job/update/${jobId}`,
+      updatedJob
+    );
+    toast.success(data.message);
+    setEditingMode(null);
+  } catch (error) {
+    toast.error(
+      error?.response?.data?.message || "Failed to update job"
+    );
+  }
+};
 
   //Function For Deleting Job
   const handleDeleteJob = async (jobId) => {
-    await axios
-      .delete(`http://localhost:4000/api/v1/job/delete/${jobId}`, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        toast.success(res.data.message);
-        setMyJobs((prevJobs) => prevJobs.filter((job) => job._id !== jobId));
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
-      });
-  };
+  try {
+    const { data } = await api.delete(
+      `/api/v1/job/delete/${jobId}`
+    );
+    toast.success(data.message);
+    setMyJobs((prevJobs) =>
+      prevJobs.filter((job) => job._id !== jobId)
+    );
+  } catch (error) {
+    toast.error(
+      error?.response?.data?.message || "Failed to delete job"
+    );
+  }
+};
 
   const handleInputChange = (jobId, field, value) => {
     // Update the job object in the jobs state with the new value

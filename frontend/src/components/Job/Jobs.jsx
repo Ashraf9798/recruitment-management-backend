@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../../main";
 
@@ -8,21 +8,22 @@ const Jobs = () => {
   const { isAuthorized } = useContext(Context);
   const navigateTo = useNavigate();
   useEffect(() => {
+  const fetchJobs = async () => {
     try {
-      axios
-        .get("http://localhost:4000/api/v1/job/getall", {
-          withCredentials: true,
-        })
-        .then((res) => {
-          setJobs(res.data);
-        });
+      const { data } = await api.get("/api/v1/job/getall");
+      setJobs(data);
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  };
+
+  fetchJobs();
+}, []);
+
   if (!isAuthorized) {
-    navigateTo("/");
-  }
+  return null;
+}
+
 
   return (
     <section className="jobs page">

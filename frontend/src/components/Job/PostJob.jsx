@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../../main";
@@ -18,59 +18,47 @@ const PostJob = () => {
   const { isAuthorized, user } = useContext(Context);
 
   const handleJobPost = async (e) => {
-    e.preventDefault();
-    if (salaryType === "Fixed Salary") {
-      setSalaryFrom("");
-      setSalaryFrom("");
-    } else if (salaryType === "Ranged Salary") {
-      setFixedSalary("");
-    } else {
-      setSalaryFrom("");
-      setSalaryTo("");
-      setFixedSalary("");
-    }
-    await axios
-      .post(
-        "http://localhost:4000/api/v1/job/post",
-        fixedSalary.length >= 4
-          ? {
-              title,
-              description,
-              category,
-              country,
-              city,
-              location,
-              fixedSalary,
-            }
-          : {
-              title,
-              description,
-              category,
-              country,
-              city,
-              location,
-              salaryFrom,
-              salaryTo,
-            },
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      .then((res) => {
-        toast.success(res.data.message);
-      })
-      .catch((err) => {
-        toast.error(err.response.data.message);
-      });
-  };
+  e.preventDefault();
 
-  const navigateTo = useNavigate();
-  if (!isAuthorized || (user && user.role !== "Employer")) {
-    navigateTo("/");
+  try {
+    const payload =
+      salaryType === "Fixed Salary"
+        ? {
+            title,
+            description,
+            category,
+            country,
+            city,
+            location,
+            fixedSalary,
+          }
+        : {
+            title,
+            description,
+            category,
+            country,
+            city,
+            location,
+            salaryFrom,
+            salaryTo,
+          };
+
+    const { data } = await api.post("/api/v1/job/post", payload);
+
+    toast.success(data.message);
+    navigateTo("/job/getall");
+  } catch (err) {
+    toast.error(
+      err?.response?.data?.message || "Failed to post job"
+    );
   }
+};
+
+
+  if (!isAuthorized || (user && user.role !== "Employer")) {
+  return null;
+}
+
 
   return (
     <>
