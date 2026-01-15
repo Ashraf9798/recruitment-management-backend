@@ -5,7 +5,8 @@ import { RiLock2Fill } from "react-icons/ri";
 import { FaPencilAlt } from "react-icons/fa";
 import { FaPhoneFlip } from "react-icons/fa6";
 import { Link, Navigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import api from "../../services/api";
 import toast from "react-hot-toast";
 import { Context } from "../../main";
 
@@ -21,8 +22,7 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(
-        "http://localhost:4000/api/v1/user/register",
+      const { data } = await api.post("/api/v1/user/register",
         { name, phone, email, role, password },
         {
           headers: {
