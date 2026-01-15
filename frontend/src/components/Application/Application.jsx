@@ -1,4 +1,5 @@
-import axios from "axios";
+// import axios from "axios";
+import api from "../../services/api";
 import React, { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
@@ -71,16 +72,16 @@ const Application = () => {
     formData.append("jobId", id);
 
     try {
-      const { data } = await axios.post(
-        "http://localhost:4000/api/v1/application/post",
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+          const { data } = await api.post(
+            "/api/v1/application/post",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+
       setName("");
       setEmail("");
       setCoverLetter("");
@@ -103,9 +104,10 @@ const Application = () => {
     }
   };
 
-  if (!isAuthorized || (user && user.role === "Employer")) {
-    navigateTo("/");
-  }
+ if (!isAuthorized || (user && user.role === "Employer")) {
+  return null;
+}
+
 
   return (
     <section className="application">
