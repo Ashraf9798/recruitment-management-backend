@@ -1,7 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Context } from "../../main";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import api from "../../services/api";
 import toast from "react-hot-toast";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { AiOutlineClose } from "react-icons/ai"; // Import the close icon
@@ -11,21 +12,36 @@ const Navbar = () => {
   const { isAuthorized, setIsAuthorized, user } = useContext(Context);
   const navigateTo = useNavigate();
 
+  // const handleLogout = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       "http://localhost:4000/api/v1/user/logout",
+  //       {
+  //         withCredentials: true,
+  //       }
+  //     );
+  //     toast.success(response.data.message);
+  //     setIsAuthorized(false);
+  //     navigateTo("/login");
+  //   } catch (error) {
+  //     toast.error(error.response.data.message), setIsAuthorized(true);
+  //   }
+  // };
+
   const handleLogout = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:4000/api/v1/user/logout",
-        {
-          withCredentials: true,
-        }
-      );
-      toast.success(response.data.message);
-      setIsAuthorized(false);
-      navigateTo("/login");
-    } catch (error) {
-      toast.error(error.response.data.message), setIsAuthorized(true);
-    }
-  };
+  try {
+    const { data } = await api.get("/api/v1/user/logout");
+
+    toast.success(data.message);
+    setIsAuthorized(false);
+    navigateTo("/login");
+  } catch (error) {
+    toast.error(
+      error?.response?.data?.message || "Logout failed"
+    );
+  }
+};
+
 
   return (
     <nav className={isAuthorized ? "navbarShow" : "navbarHide"}>
